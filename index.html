@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>आमा समूह नेपाल - महा-पोर्टल (SaaS ERP)</title>
     
-    <!-- PWA र मोबाइल आइकन सपोर्ट (icon.png अनिवार्य) -->
+    <!-- PWA र मोबाइल आइकन सपोर्ट -->
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -62,12 +62,9 @@
 </head>
 <body>
 
-<!-- ========================================== -->
-<!-- १. लगइन स्क्रिन (Multi-Role Simulation Login) -->
-<!-- ========================================== -->
+<!-- === १. लगइन स्क्रिन === -->
 <div id="login-layer" class="login-page">
     <div class="login-box">
-        <!-- एप आइकनको नमुना प्रदर्शन -->
         <img src="icon.png" alt="Logo" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; border: 2px solid #eee;" onerror="this.src='https://placeholder.com'">
         <h2>आमा समूह नेपाल</h2>
         <p style="font-size: 13px; color: #666; margin-bottom: 15px;">एकीकृत मल्टि-टेनेन्ट ई-आरपि प्रणाली</p>
@@ -98,12 +95,73 @@
 </div>
 
 
-<!-- ========================================== -->
-<!-- २. मुख्य सुरक्षित महा-पोर्टल (ERP Dashboard) -->
-<!-- ========================================== -->
+<!-- === २. मुख्य सुरक्षित महा-पोर्टल ड्यासबोर्ड === -->
 <div id="dashboard-layer" class="dashboard-layout">
     <div class="header">
         <h2>आमा समूह नेपाल - डिजिटल महा-पोर्टल सुपर एप</h2>
+        <span id="user-display-tag" class="user-badge">Role: Admin</span>
+        <button class="logout-btn" onclick="executeLogout()">लगाउट</button>
+    </div>
+    
+    <div id="domain-banner" class="domain-banner">Redirected to: mainportal.aamasamuha.org</div>
+
+    <div class="main-container">
+        <div class="sidebar" id="sidebar-menu"></div>
+
+        <div class="content-area" id="main-content-window">
+            
+            <!-- क) केन्द्र ब्याकइन्ड: विज्ञापन र सेयरिङ फिड -->
+            <div id="mod-ad-social" class="module-section">
+                <h3>📢 केन्द्रीय विज्ञापन र साझा सामाजिक सञ्जाल फिड</h3>
+                <p>देशभरिका आमा समूहले साझा गरेका फोटो/भिडियो र केन्द्रीय विज्ञापन व्यवस्थापन।</p>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 4px; border-left: 5px solid #2e7d32;">
+                    <strong>📍 विज्ञापनदाता: सुजल डेरी सहकारी, टोखा</strong><br>
+                    <small>बजेट: रु. १५,००० | लक्षित वडा: झोर महांकाल (Active)</small>
+                </div>
+            </div>
+
+            <!-- ख) आमा समूह काम: माइन्युटिङ र डिजिटल सूचना -->
+            <div id="mod-minuting" class="module-section">
+                <h3>📝 डिजिटल माइन्युट र बैठक निर्णय स्रेस्ता (सचिव कक्ष)</h3>
+                <table class="data-table">
+                    <thead><tr><th>मिति</th><th>एजेन्डा / विषय</th><th>निर्णय सारंश</th></tr></thead>
+                    <tbody>
+                        <tr><td>२०८३/०५/०२</td><td>कृषि उद्यम बिउ संकलन</td><td>सबै सदस्यले रु ५०० संकलन गरी कृषि बिउ किन्ने निर्णय।</td></tr>
+                        <tr><td>२०८३/०५/१०</td><td>आकस्मिक विपद् व्यवस्थापन</td><td>बाढी पीडित परिवारलाई राहत दिन १०,००० छुट्ट्याइयो।</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ग) आमा समूह काम: लेनदेन र लेखाजोखा खाता -->
+            <div id="mod-lenden" class="module-section">
+                <h3>💰 आमा समूह लेनदेन, आन्तरिक बचत तथा ऋण खाता (कोषाध्यक्ष कक्ष)</h3>
+                <table class="data-table">
+                    <thead><tr><th>सदस्यको नाम</th><th>बचत प्रकार</th><th>ऋण प्रवाह रकम</th><th>स्थिति</th></tr></thead>
+                    <tbody>
+                        <tr><td>सीता अधिकारी</td><td>मासिक बचत</td><td>रु. ५००</td><td>जम्मा भयो</td></tr>
+                        <tr><td>सावित्री तामाङ</td><td>ऋण लगानी</td><td>रु. २०,०००</td><td>ब्याज भुक्तानी बाँकी</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- घ) वडा/पालिका काम: कर, पञ्जीकरण र घरभाडा (त्रुटि यहाँ सच्याइएको छ) -->
+            <div id="mod-egov" class="module-section">
+                <h3>🏛️ वडा ई-गभर्नेन्स, सम्पत्ति कर र डेरावाल सुरक्षा लगत</h3>
+                <table class="data-table">
+                    <thead><tr><th>घरधनी / भाडावाल</th><th>ठेगाना/वडा</th><th>परिचयपत्र (ID)</th><th>घरभाडा सम्झौता अवधि</th></tr></thead>
+                    <tbody>
+                        <tr><td>संगीता थापा मगर</td><td>झोर महांकाल, वडा १</td><td><span style="color:green;">Uploaded (नागरिकता)</span></td><td>१ वर्ष (सक्रिय)</td></tr>
+                        <tr><td>जोन डो (विदेशी)</td><td>बौद्धेश्वर झरना क्षेत्र</td><td><span style="color:orange;">Pending (पासपोर्ट)</span></td><td>३ महिना (पर्यटक)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ङ) वडा काम: बजेट माग र विनियोजन कार्यक्रम -->
+            <div id="mod-budget" class="module-section">
+                <h3>📊 साना कार्यक्रम बजेट माग तथा विनियोजन चक्र</h3>
+                <table class="data-table">
+                    <thead><tr><th>माग गर्ने संस्था</th><th>कार्यक्रम शीर्षक</th><th>माग रकम</th><th>स्वीकृत बजेट</th><th>स्थिति</th></tr></thead>
+                    <tbody>
         <span id="user-display-tag" class="user-badge">Role: Admin</span>
         <button class="logout-btn" onclick="executeLogout()">लगाउट</button>
     </div>
