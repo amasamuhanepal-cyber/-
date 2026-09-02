@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>आमा समूह नेपाल - महा-पोर्टल (SaaS ERP)</title>
+    
+    <!-- PWA र मोबाइल आइकन सपोर्ट (icon.png अनिवार्य) -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#d9534f">
+
+    <!-- Leaflet CSS Maps को लागि -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+
+    <style>
+        :root { --primary: #d9534f; --dark-bg: #2c3e50; --success: #2e7d32; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f6f9; color: #333; }
+        
+        /* 1. Login Interface */
+        .login-page { display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--dark-bg); }
+        .login-box { background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 360px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .login-box h2 { color: var(--primary); margin-top: 0; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .error-msg { color: red; margin-bottom: 10px; display: none; }
+
+        /* 2. Main Dashboard Interface */
+        .dashboard-layout { display: none; }
+        .header { background: var(--primary); color: white; padding: 15px; text-align: center; position: relative; }
+        .header .user-badge { background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+        .logout-btn { position: absolute; right: 15px; top: 18px; background: #333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+        .domain-banner { background: #fff3e0; padding: 8px; text-align: center; font-weight: bold; color: #e65100; border-bottom: 1px solid #ffe0b2; font-size: 14px; }
+        
+        .main-container { display: flex; flex-direction: column; padding: 15px; gap: 15px; }
+        @media(min-width: 768px) { .main-container { flex-direction: row; } }
+
+        /* Navigation Side Panel */
+        .sidebar { background: white; padding: 15px; border-radius: 6px; width: 100%; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        @media(min-width: 768px) { .sidebar { width: 250px; } }
+        .sidebar button { width: 100%; padding: 12px; margin-bottom: 8px; border: none; background: #f8f9fa; text-align: left; border-radius: 4px; font-weight: bold; cursor: pointer; border-left: 4px solid #ccc; }
+        .sidebar button.active { background: #ffebee; border-left-color: var(--primary); color: var(--primary); }
+
+        /* Content Modules */
+        .content-area { flex: 1; background: white; padding: 20px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .module-section { display: none; }
+        .module-section.active { display: block; }
+        
+        /* Elements */
+        #map { width: 100%; height: 350px; border-radius: 4px; margin-top: 10px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .data-table th, .data-table td { border: 1px solid #eee; padding: 10px; text-align: left; }
+        .data-table th { background: #f8f9fa; }
+        .btn-action { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .g-sheet-btn { background: #2e7d32; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<!-- ========================================== -->
+<!-- १. लगइन स्क्रिन (Multi-Role Simulation Login) -->
+<!-- ========================================== -->
+<div id="login-layer" class="login-page">
+    <div class="login-box">
+        <!-- एप आइकनको नमुना प्रदर्शन -->
+        <img src="icon.png" alt="Logo" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; border: 2px solid #eee;" onerror="this.src='https://placeholder.com'">
+        <h2>आमा समूह नेपाल</h2>
+        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">एकीकृत मल्टि-टेनेन्ट ई-आरपि प्रणाली</p>
+        <div id="login-error" class="error-msg">गलत प्रयोगकर्ता नाम वा पासवर्ड!</div>
+        
+        <div class="input-group">
+            <label>पद अनुसार युजर छान्नुहोस् (Demo Auto-Fill)</label>
+            <select id="demo-user-select" onchange="autoFillCredentials()">
+                <option value="">-- छान्नुहोस् --</option>
+                <option value="super">१. केन्द्रीय सुपर एडमिन (आमा समूह नेपाल केन्द्र)</option>
+                <option value="gov">२. स्थानीय सरकार प्रमुख (वडा अध्यक्ष/सचिव)</option>
+                <option value="sec">३. आमा समूह सचिव (माइन्युट/सूचना)</option>
+                <option value="tres">४. आमा समूह कोषाध्यक्ष (लेखाजोखा/लेनदेन)</option>
+                <option value="citizen">५. आम नागरिक / समूह सदस्य</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>प्रयोगकर्ता नाम (Username)</label>
+            <input type="text" id="username" placeholder="Username">
+        </div>
+        <div class="input-group">
+            <label>पासवर्ड (Password)</label>
+            <input type="password" id="password" placeholder="Password">
+        </div>
+        <button class="login-btn" onclick="executeMockLogin()">लगइन गर्नुहोस्</button>
+    </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- २. मुख्य सुरक्षित महा-पोर्टल (ERP Dashboard) -->
+<!-- ========================================== -->
+<div id="dashboard-layer" class="dashboard-layout">
+    <div class="header">
+        <h2>आमा समूह नेपाल - डिजिटल महा-पोर्टल सुपर एप</h2>
+        <span id="user-display-tag" class="user-badge">Role: Admin</span>
+        <button class="logout-btn" onclick="executeLogout()">लगाउट</button>
+    </div>
+    
+    <!-- डाइनामिक डोमेन रिडिरेक्सन प्रदर्शन ब्यानर -->
+    <div id="domain-banner" class="domain-banner">Redirected to: mainportal.aamasamuha.org</div>
+
+    <div class="main-container">
+        <!-- देब्रे पट्टी: पद अनुसार मोड्युल फिल्टर हुने मेनु -->
+        <div class="sidebar" id="sidebar-menu">
+            <!-- Navigation Buttons via JS dynamically toggled -->
+        </div>
+
+        <!-- दायाँ पट्टी: छानेको विधा अनुसार मुख्य काम गर्ने ठाउँ -->
+        <div class="content-area" id="main-content-window">
+            
+            <!-- क) केन्द्र ब्याकइन्ड: विज्ञापन र सेयरिङ फिड -->
+            <div id="mod-ad-social" class="module-section">
+                <h3>📢 केन्द्रीय विज्ञापन र साझा सामाजिक सञ्जाल फिड</h3>
+                <p>देशभरिका आमा समूहले साझा गरेका फोटो/भिडियो र केन्द्रीय विज्ञापन व्यवस्थापन व्यवस्था।</p>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 4px; border-left: 5px solid #2e7d32;">
+                    <strong>📍 विज्ञापनदाता: सुजल डेरी सहकारी, टोखा</strong><br>
+                    <small>बजेट: रु. १५,००० | लक्षित वडा: झोर महांकाल (Active)</small>
+                </div>
+            </div>
+
+            <!-- ख) आमा समूह काम: माइन्युटिङ र डिजिटल सूचना -->
+            <div id="mod-minuting" class="module-section">
+                <h3>📝 डिजिटल माइन्युट र बैठक निर्णय स्रेस्ता (सचिव कक्ष)</h3>
+                <table class="data-table">
+                    <thead><tr><th>मिति</th><th>एजेन्डा / विषय</th><th>निर्णय सारंश</th></tr></thead>
+                    <tbody>
+                        <tr><td>२०८३/०५/०२</td><td>कृषि उद्यम बिउ संकलन</td><td>सबै सदस्यले रु ५०० संकलन गरी कृषि बिउ किन्ने निर्णय।</td></tr>
+                        <tr><td>२०८३/०५/१०</td><td>आकस्मिक विपद् व्यवस्थापन</td><td>बाढी पीडित परिवारलाई राहत दिन १०,००० छुट्ट्याइयो।</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ग) आमा समूह काम: लेनदेन र लेखाजोखा खाता -->
+            <div id="mod-lenden" class="module-section">
+                <h3>💰 आमा समूह लेनदेन, आन्तरिक बचत तथा ऋण खाता (कोषाध्यक्ष कक्ष)</h3>
+                <table class="data-table">
+                    <thead><tr><th>सदस्यको नाम</th><th>बचत प्रकार</th><th>ऋण प्रवाह रकम</th><th>स्थिति</th></tr></thead>
+                    <tbody>
+                        <tr><td>सीता अधिकारी</td><td>मासिक बचत</td><td>रु. ५००</td><td>जम्मा भयो</td></tr>
+                        <tr><td>सावित्री तामाङ</td><td>ऋण लगानी</td><td>रु. २०,०००</td><td>ब्याज भुक्तानी बाँकी</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- घ) वडा/पालिका काम: कर, पञ्जीकरण र घरभाडा -->
+            <div id="mod-egov" class="module-section">
+                <h3>🏛️ वडा ई-गभर्नेन्स, सम्पत्ति कर र डेरावाल सुरक्षा लगत</h3>
+                <table class="data-table">
+                    <thead><tr><th>घरधनी / भाडावाल</th><th>ठेगाना/वडा</th><th>परिचयपत्र (ID)</th><th>घरभाडा सम्झौता अवधि</th></tr></thead>
+                    <tbody>
+                        <tr><td>संगीता थापा मगर</td><td>झोर महांकाल, वडा १</td><td><span style="color:green;">Uploaded (नागरिकता)</span></td><td>१ वर्ष (सक्रिय)</td></tr>
+                        <tr><td>जोन डो (विदेशी)</td><td>बौद्धेश्वर झरना क्षेत्र</td><td><span style="color:orange;">Pending (पासपोर्ट)</span></td><td>३ महिना (पर्यटक)</td></tr>
+                    </tbody>
+                </table>
