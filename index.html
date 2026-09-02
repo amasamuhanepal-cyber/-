@@ -222,3 +222,23 @@
                         <tr><td>जोन डो (विदेशी)</td><td>बौद्धेश्वर झरना क्षेत्र</td><td><span style="color:orange;">Pending (पासपोर्ट)</span></td><td>३ महिना (पर्यटक)</td></tr>
                     </tbody>
                 </table>
+// सच्याइएको लगइन कमाण्ड (Replace this function inside your script)
+function executeMockLogin() {
+    const u = document.getElementById("username").value;
+    const p = document.getElementById("password").value;
+    const err = document.getElementById("login-error");
+
+    if (USER_DATABASE[u] && USER_DATABASE[u].pass === p) {
+        err.style.display = "none";
+        localStorage.setItem("active_user_session", u);
+        
+        // सुरक्षा तह खारेज गरी सिधै ड्यासबोर्ड देखाउने कमाण्ड
+        document.getElementById("login-layer").style.display = "none";
+        document.getElementById("dashboard-layer").style.style.setProperty("display", "block", "important");
+        
+        bootDashboard(u);
+    } else {
+        err.style.display = "block";
+    }
+}
+                
